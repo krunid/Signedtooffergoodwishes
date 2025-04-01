@@ -1,0 +1,324 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ลงนามถวายพระพร</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background: url('https://img.kapook.com/u/2016/suppaporn/2016/king/palace02/palace02.jpg') center/cover no-repeat;
+        }
+        .navbar {
+            width: 100%;
+            background-color: #333;
+            padding: 1% 2%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            display: flex;
+            justify-content: flex-end;
+            z-index: 10;
+        }
+        .navbar a {
+            color: white;
+            text-decoration: none;
+            padding: 0.8% 1.5%;
+            font-size: clamp(14px, 2vw, 18px);
+        }
+        .navbar a:hover {
+            background-color: #555;
+        }
+        .dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: #f9f9f9;
+            min-width: 200px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 11;
+        }
+        .dropdown-content input {
+            width: 90%;
+            margin: 5%;
+            padding: 2%;
+            font-size: clamp(12px, 1.5vw, 16px);
+        }
+        .dropdown-content button {
+            width: 90%;
+            margin: 5%;
+            padding: 2% 5%;
+            font-size: clamp(12px, 1.5vw, 16px);
+        }
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+        .card-container {
+            perspective: 1000px;
+            width: clamp(300px, 80vw, 400px);
+            height: clamp(400px, 60vh, 500px);
+            position: relative;
+            margin: 10vh auto 5vh;
+        }
+        .card {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+            transition: transform 0.8s;
+        }
+        .card.flipped {
+            transform: rotateY(180deg);
+        }
+        .front, .back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .front {
+            background: url('https://fz.lnwfile.com/_/fz/_raw/cl/91/eh.jpg') center/cover;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end;
+            padding: 5%;
+            color: white;
+            text-shadow: 0 0 5px rgba(0,0,0,0.8);
+        }
+        .back {
+            background-color: white;
+            transform: rotateY(180deg);
+            padding: 5%;
+            text-align: center;
+        }
+        .front h2, .back h3 {
+            font-size: clamp(18px, 3vw, 24px);
+            margin-bottom: 2%;
+        }
+        select, input {
+            margin: 2% 0;
+            padding: 2%;
+            width: 90%;
+            font-size: clamp(12px, 2vw, 16px);
+        }
+        button {
+            padding: 2% 5%;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: clamp(12px, 2vw, 16px);
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        footer {
+            width: 100%;
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 1% 0;
+            font-size: clamp(12px, 1.5vw, 16px);
+        }
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .loading-spinner {
+            width: clamp(40px, 10vw, 60px);
+            height: clamp(40px, 10vw, 60px);
+            position: relative;
+        }
+        .cat {
+            width: 100%;
+            height: 100%;
+            background: url('https://cms-assets.tutsplus.com/cdn-cgi/image/width=850/uploads/users/403/posts/108740/image-upload/gif_01.gif') center/contain no-repeat;
+            animation: bounce 1s infinite;
+        }
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-20px); }
+            60% { transform: translateY(-10px); }
+        }
+        /* Popup Styles */
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            z-index: 1001;
+            text-align: center;
+        }
+        .popup button {
+            margin-top: 10px;
+            background-color: #4CAF50;
+        }
+        .popup-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+        }
+        /* Media Queries */
+        @media (max-width: 600px) {
+            .card-container {
+                width: 90vw;
+                height: 50vh;
+            }
+            .navbar {
+                padding: 2% 3%;
+            }
+            .dropdown-content {
+                min-width: 150px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="dropdown">
+            <a href="#">Pict</a>
+            <div class="dropdown-content">
+                <input type="text" id="imageUrl" placeholder="ใส่ URL รูปภาพใหม่">
+                <button onclick="changeImage()">เปลี่ยนรูปภาพ</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="card-container">
+        <div class="card" id="card">
+            <div class="front" id="cardFront">
+                <h2>ถวายพระพร</h2>
+                <button onclick="flipCard()">กรุณาลงนาม</button>
+            </div>
+            <div class="back">
+                <h3>ลงนามถวายพระพร</h3>
+                <select id="blessing">
+                    <option value="1">ขอพระองค์ทรงพระเจริญยิ่งยืนนาน</option>
+                    <option value="2">ขอพระองค์ทรงมีพระพลานามัยแข็งแรง</option>
+                    <option value="3">ขอพระองค์ทรงพระเกษมสำราญ</option>
+                </select>
+                <input type="text" id="firstName" placeholder="ชื่อ-นามสกุล">
+                <input type="text" id="lastName" placeholder="หน่วยงานจัจังหวัด">
+                <button onclick="submitBlessing()">ลงนามและส่ง</button>
+            </div>
+        </div>
+    </div>
+    <footer>
+        <p>© 2025 ลงนามถวายพระพร | พัฒนาโดย ครูนิด ศิษย์หลวงพ่อเสือ เขียนโปแกรมโดย xAI</p>
+    </footer>
+
+    <div class="loading-overlay" id="loading">
+        <div class="loading-spinner">
+            <div class="cat"></div>
+        </div>
+    </div>
+
+    <!-- Popup HTML -->
+    <div class="popup-overlay" id="popupOverlay"></div>
+    <div class="popup" id="popup">
+        <p id="popupMessage"></p>
+        <button onclick="hidePopup()">ตกลง</button>
+    </div>
+
+    <script>
+        function showLoading() {
+            document.getElementById('loading').style.display = 'flex';
+        }
+
+        function hideLoading() {
+            document.getElementById('loading').style.display = 'none';
+        }
+
+        function flipCard() {
+            document.getElementById('card').classList.toggle('flipped');
+        }
+
+        function showPopup(message) {
+            document.getElementById('popupMessage').textContent = message;
+            document.getElementById('popup').style.display = 'block';
+            document.getElementById('popupOverlay').style.display = 'block';
+        }
+
+        function hidePopup() {
+            document.getElementById('popup').style.display = 'none';
+            document.getElementById('popupOverlay').style.display = 'none';
+        }
+
+        function changeImage() {
+            const imageUrl = document.getElementById('imageUrl').value;
+            if (imageUrl) {
+                showLoading();
+                setTimeout(() => {
+                    document.getElementById('cardFront').style.background = `url('${imageUrl}') center/cover`;
+                    document.getElementById('imageUrl').value = '';
+                    hideLoading();
+                    showPopup('เปลี่ยนรูปภาพสำเร็จ!');
+                }, 1000);
+            } else {
+                showPopup('กรุณาใส่ URL รูปภาพ');
+            }
+        }
+
+        function submitBlessing() {
+            const blessingSelect = document.getElementById('blessing');
+            const blessingText = blessingSelect.options[blessingSelect.selectedIndex].text;
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+
+            if (!firstName || !lastName) {
+                showPopup('กรุณากรอกชื่อและนามสกุล');
+                return;
+            }
+
+            const message = `ลงนามถวายพระพร\nข้อความ: ${blessingText}\nชื่อ: ${firstName} ${lastName}`;
+            showLoading();
+            setTimeout(() => {
+                sendToTelegram(message);
+                hideLoading();
+                showPopup('ลงนามสำเร็จ!');
+                flipCard();
+            }, 1000);
+        }
+
+        function sendToTelegram(message) {
+            const botToken = 'YOUR_BOT_TOKEN';
+            const chatId = 'YOUR_CHAT_ID';
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+            console.log('ส่งไป Telegram:', message);
+        }
+    </script>
+</body>
+</html>
