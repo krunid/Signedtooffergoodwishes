@@ -179,7 +179,7 @@
             z-index: 1001;
             text-align: center;
             max-width: 80%;
-            white-space: pre-wrap; /* เพื่อให้ข้อความขึ้นบรรทัดใหม่ตาม \n */
+            white-space: pre-wrap;
         }
         .popup button {
             margin-top: 10px;
@@ -274,7 +274,7 @@
                 if (progress >= 100) {
                     clearInterval(interval);
                 }
-            }, 100); // ปรับความเร็วได้โดยเปลี่ยนตัวเลขนี้
+            }, 100);
         }
 
         function hideProgress() {
@@ -325,10 +325,21 @@
             const message = `ลงนามถวายพระพร\nข้อความ: ${blessingText}\nชื่อ-นามสกุล: ${firstName}\nหน่วยงาน/จังหวัด: ${lastName}`;
             showProgress();
             setTimeout(() => {
+                sendToTelegram(message);
                 hideProgress();
                 showPopup(`${message}\n\nลงนามสำเร็จ!`);
                 flipCard();
             }, 1000);
+        }
+
+        function sendToTelegram(message) {
+            const botToken = '7938227619:AAE1GcbVwDcBqeXEYfeXHV6w8liNlp-9c9I';
+            const chatId = '7938227619';
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+            fetch(url)
+                .then(response => response.json())
+                .then(data => console.log('ส่งไป Telegram สำเร็จ:', data))
+                .catch(error => console.error('เกิดข้อผิดพลาดในการส่ง Telegram:', error));
         }
     </script>
 </body>
