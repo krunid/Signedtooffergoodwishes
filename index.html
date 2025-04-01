@@ -325,21 +325,30 @@
             const message = `ลงนามถวายพระพร\nข้อความ: ${blessingText}\nชื่อ-นามสกุล: ${firstName}\nหน่วยงาน/จังหวัด: ${lastName}`;
             showProgress();
             setTimeout(() => {
-                sendToTelegram(message);
-                hideProgress();
-                showPopup(`${message}\n\nลงนามสำเร็จ!`);
-                flipCard();
+                sendToTelegram(message)
+                    .then(data => {
+                        hideProgress();
+                        if (data.ok) {
+                            showPopup(`${message}\n\nลงนามสำเร็จ!`);
+                        } else {
+                            showPopup(`${message}\n\nเกิดข้อผิดพลาดในการส่งไป Telegram: ${data.description}`);
+                        }
+                        flipCard();
+                    })
+                    .catch(error => {
+                        hideProgress();
+                        showPopup(`${message}\n\nเกิดข้อผิดพลาดในการส่งไป Telegram: ${error.message}`);
+                        flipCard();
+                    });
             }, 1000);
         }
 
         function sendToTelegram(message) {
-            const botToken = '8043730633:AAHJe0tb33Y8o9UhFWu71B1lfs8GqArRm2Y';
-            const chatId = '7261250509';
+            const botToken = '7863124405:AAHd5uVLuUMKfawH-lB3igubWego5v4aCbU'; // แทนที่ด้วย Bot Token ของคุณ
+            const chatId = '7261250509'; // แทนที่ด้วย Chat ID ของผู้ใช้หรือกลุ่ม
             const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
-            fetch(url)
-                .then(response => response.json())
-                .then(data => console.log('ส่งไป Telegram สำเร็จ:', data))
-                .catch(error => console.error('เกิดข้อผิดพลาดในการส่ง Telegram:', error));
+            return fetch(url)
+                .then(response => response.json());
         }
     </script>
 </body>
