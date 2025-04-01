@@ -322,31 +322,60 @@
                 return;
             }
 
-            const message = `ลงนามถวายพระพร\nข้อความ: ${blessingText}\nชื่อ-นามสกุล: ${firstName}\nหน่วยงาน/จังหวัด: ${lastName}`;
+            // จัดรูปแบบข้อความให้อ่านง่าย
+            const message = `<b>📜 ลงนามถวายพระพร</b>\n\n` +
+                           `<b>คำถวายพระพร:</b> ${blessingText}\n` +
+                           `<b>ชื่อ-นามสกุล:</b> ${firstName}\n` +
+                           `<b>หน่วยงาน/จังหวัด:</b> ${lastName}\n` +
+                           `\n<i>วันที่:</i> ${new Date().toLocaleString('th-TH')}`;
+
+            const popupMessage = `📜 ลงนามถวายพระพร\n\n` +
+                                 `คำถวายพระพร: ${blessingText}\n` +
+                                 `ชื่อ-นามสกุล: ${firstName}\n` +
+                                 `หน่วยงาน/จังหวัด: ${lastName}\n` +
+                                 `วันที่: ${new Date().toLocaleString('th-TH')}`;
+
             showProgress();
             setTimeout(() => {
-                sendToTelegram(message)
+                // ส่งภาพก่อน
+                sendPhotoToTelegram()
+                    .then(data => {
+                        if (!data.ok) {
+                            throw new Error(data.description);
+                        }
+                        // ส่งข้อความต่อ
+                        return sendMessageToTelegram(message);
+                    })
                     .then(data => {
                         hideProgress();
                         if (data.ok) {
-                            showPopup(`${message}\n\nลงนามสำเร็จ!`);
+                            showPopup(`${popupMessage}\n\nลงนามสำเร็จ!`);
                         } else {
-                            showPopup(`${message}\n\nเกิดข้อผิดพลาดในการส่งไป Telegram: ${data.description}`);
+                            showPopup(`${popupMessage}\n\nเกิดข้อผิดพลาดในการส่งไป Telegram: ${data.description}`);
                         }
                         flipCard();
                     })
                     .catch(error => {
                         hideProgress();
-                        showPopup(`${message}\n\nเกิดข้อผิดพลาดในการส่งไป Telegram: ${error.message}`);
+                        showPopup(`${popupMessage}\n\nเกิดข้อผิดพลาดในการส่งไป Telegram: ${error.message}`);
                         flipCard();
                     });
             }, 1000);
         }
 
-        function sendToTelegram(message) {
-            const botToken = '7863124405:AAHd5uVLuUMKfawH-lB3igubWego5v4aCbU'; // แทนที่ด้วย Bot Token ของคุณ
-            const chatId = '7261250509'; // แทนที่ด้วย Chat ID ของผู้ใช้หรือกลุ่ม
-            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}`;
+        function sendPhotoToTelegram() {
+            const botToken = '7863124405:AAHd5uVLuUMKfawH-lB3igubWego5v4aCbU';
+            const chatId = '7261250509';
+            const photoUrl = 'https://fz.lnwfile.com/_/fz/_raw/cl/91/eh.jpg';
+            const url = `https://api.telegram.org/bot${botToken}/sendPhoto?chat_id=${chatId}&photo=${encodeURIComponent(photoUrl)}`;
+            return fetch(url)
+                .then(response => response.json());
+        }
+
+        function sendMessageToTelegram(message) {
+            const botToken = '7863124405:AAHd5uVLuUMKfawH-lB3igubWego5v4aCbU';
+            const chatId = '7261250509';
+            const url = `https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(message)}&parse_mode=HTML`;
             return fetch(url)
                 .then(response => response.json());
         }
